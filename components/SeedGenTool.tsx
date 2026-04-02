@@ -33,6 +33,7 @@ export default function SeedGenTool() {
 
   const [toast, setToast] = useState<ToastState>(null);
   const [isDropActive, setIsDropActive] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const outputHtml = useMemo(() => {
@@ -123,6 +124,7 @@ export default function SeedGenTool() {
     }
 
     const t0 = performance.now();
+
     try {
       let count: number;
       if (seedCount === 'custom') {
@@ -131,6 +133,8 @@ export default function SeedGenTool() {
       } else {
         count = Number.parseInt(seedCount, 10);
       }
+
+      setIsGenerating(true);
 
       const p = parseModel(code);
       if (!p.className) throw new Error('Could not detect class name');
@@ -155,6 +159,8 @@ export default function SeedGenTool() {
       const msg = e instanceof Error ? e.message : 'Unknown error';
       setGenStatus(`✗ ${msg}`);
       showToast('Parse error: ' + msg, 'err');
+    } finally {
+      setIsGenerating(false);
     }
   }, [code, seedCount, showToast, version, withRelations, withTimestamps]);
 
@@ -271,9 +277,16 @@ export default function SeedGenTool() {
             </div>
 
             <div className="generate-wrap">
-              <button className="btn-primary" type="button" onClick={generate} style={{ flex: 1 }}>
-                <span className="spinner" aria-hidden />
-                <span>⚡ Generate</span>
+              <button
+                className="btn-primary"
+                type="button"
+                onClick={generate}
+                style={{ flex: 1 }}
+                disabled={isGenerating}
+                aria-busy={isGenerating}
+              >
+                {isGenerating ? <span className="spinner" aria-hidden /> : null}
+                <span>{isGenerating ? 'Generating…' : '⚡ Generate'}</span>
               </button>
               <button className="btn-secondary" type="button" onClick={clearAll}>
                 Clear

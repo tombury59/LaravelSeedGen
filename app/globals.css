@@ -107,7 +107,7 @@ nav.site-nav {
 }
 
 nav.site-nav a {
-  color: var(--text2);
+  color: var(--text);
   text-decoration: none;
   font-size: 13.5px;
   transition: color 0.15s;
